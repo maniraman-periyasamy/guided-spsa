@@ -1,0 +1,60 @@
+# Configuration for regression
+
+defaults:
+  - override hydra/sweeper: optuna
+  - override hydra/sweeper/sampler: tpe
+
+hydra:
+  sweeper:
+    sampler:
+      seed: 123
+      n_startup_trials: 10
+    direction: minimize
+    study_name: SPSA_hyperparameterTune
+    storage: null
+    n_trials: 80
+    n_jobs: 1
+    custom_search_space: regression.configure
+
+dataset_params:
+  dataset_size: 500
+  n_features: 4
+  n_classes: 3
+  batch_size: 32
+  validation_size: 0.2
+  test_size: 0.1
+  name: "iris" # "iris", "make_classification"
+  noise: 0.1
+  
+
+classical_model_params:
+  hidden_units: 10
+  hidden_layers: 1
+
+quantum_model_params:
+  layers: 5
+  scaling_weights_lr: 1e-1
+  n_qubits: 4
+  quantum_weight_initialization: "random" # "random", "zeros", "ones"
+
+algorithm_params:
+  method: "quantum" # "classical", "quantum"
+  lr: 3e-2
+  optimizer: "Adam" # "Adam", "SGD", "AMSGrad", "RMSProp", "Pure_SPSA"
+  epochs: 100
+  gradient_type: "Guided-SPSA" # "SPSA", "Param-shift", "Guided-SPSA"
+  computation_type: "analytical" # "analytical", "shot-based", "ibmq", "noisy", "error-mitig"
+  spsa_epsilon: 0.1
+  spsa_batch_size: 10
+  spsa_damping_factor: 1.0
+  g_spsa_param_ratio: 0.5
+  opt_momentum: 0.5
+  opt_rho: 0.9
+  repeats: 1
+
+
+log_params:
+  tb_log: "Res_idel_class/"
+  model_log: "models/"
+  matplot_log: "plots/"
+
