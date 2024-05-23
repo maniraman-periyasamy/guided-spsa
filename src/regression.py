@@ -1,19 +1,26 @@
-import torch
-import torch.nn.functional as F
-from torch.utils.data import TensorDataset, DataLoader
+# Author : Maniraman Periyasamy
+# This code is part of guided-spsa repository.
+# This code uses parts of code snippets from qiskit
+# If used in your project please cite this work as described in the README file.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
 
+
+
+
+
+import torch
 import warnings
 warnings.filterwarnings("ignore")
 
-# PyTorch TensorBoard support
-from torch.utils.tensorboard import SummaryWriter
-from datetime import datetime
-
-
-import matplotlib.pyplot as plt
 import numpy as np
 import math
-import os
 from sklearn.metrics import mean_absolute_error
 from os import environ
 environ['OPENBLAS_NUM_THREADS'] = '1'
@@ -22,8 +29,6 @@ environ['OPENBLAS_NUM_THREADS'] = '1'
 import hydra
 from hydra.core.config_store import ConfigStore
 from config import regressionConfig
-from optuna.trial import Trial
-from omegaconf import DictConfig
 from omegaconf import OmegaConf
 
 
@@ -47,7 +52,7 @@ def main(cfg: regressionConfig) -> float:
     test_avg = 0.0
     converegence_avg = 0.0
     datasets = [ "Any"]
-    for dataset_name in datasets:
+    for dataset_name in datasets: 
         rep_avg = 0
         converegence_rep_avg = 0
         for rep in range(cfg.algorithm_params.repeats):
@@ -197,32 +202,12 @@ def main(cfg: regressionConfig) -> float:
             f = open(log_root + "/test_metric.txt", "a")
             f.write(f"Test Metric: {test_executer.avg_accuracy}")
             f.close()
-            #plt.scatter(np.arange(len(test_executer.y_true_batches)), test_executer.y_true_batches, c="red")
-            #plt.scatter(np.arange(len(test_executer.y_pred_batches)), test_executer.y_pred_batches, c="green")
-            #plt.savefig(log_root + "/"+cfg.dataset_params.name +"_test.png")
             rep_avg = rep_avg + test_executer.avg_accuracy
             converegence_rep_avg += model_saver.best_epoch
         test_avg += rep_avg/cfg.algorithm_params.repeats
         converegence_avg += converegence_rep_avg/cfg.algorithm_params.repeats 
     print(f"{log_root} yieled an acccuracy of {test_avg/len(datasets)} and convergence rate of {converegence_avg/len(datasets)}")
     return test_avg/len(datasets)
-
-def configure(cfg: regressionConfig, trial: Trial) -> None:
-
-    trial.suggest_loguniform("algorithm_params.lr", 0.001, 0.1)  # note +w here, not w as w is a new parameter
-    trial.suggest_uniform("algorithm_params.spsa_epsilon", 0.1, 0.6)
-
-    if cfg.algorithm_params.optimizer == "SGD" or cfg.algorithm_params.optimizer == "Pure_SPSA":  # "Adam", "SGD", "AMSGrad", "RMSProp"
-        trial.suggest_loguniform("algorithm_params.opt_momentum", 0.001, 0.2)
-        trial.suggest_loguniform("algorithm_params.opt_rho", 0.001, 0.2)
-        
-    elif cfg.algorithm_params.optimizer == "Adam" or cfg.algorithm_params.optimizer == "AMSGrad":
-        trial.suggest_uniform("algorithm_params.opt_momentum", 0.1, 0.9)
-        trial.suggest_uniform("algorithm_params.opt_rho", 0.1, 0.999)
-
-    elif cfg.algorithm_params.optimizer == "RMSProp":
-        trial.suggest_loguniform("algorithm_params.opt_momentum", 0.001, 0.2)
-        trial.suggest_uniform("algorithm_params.opt_rho", 0.1, 0.999)
 
 if __name__ == "__main__":
 

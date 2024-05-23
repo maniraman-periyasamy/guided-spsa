@@ -1,19 +1,26 @@
-import torch
-import torch.nn.functional as F
-from torch.utils.data import TensorDataset, DataLoader
+# Author : Maniraman Periyasamy
+# This code is part of guided-spsa repository.
+# This code uses parts of code snippets from qiskit
+# If used in your project please cite this work as described in the README file.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
 
+
+
+
+import torch
 import warnings
 warnings.filterwarnings("ignore")
 
-# PyTorch TensorBoard support
-from torch.utils.tensorboard import SummaryWriter
-from datetime import datetime
 
-
-import matplotlib.pyplot as plt
 import numpy as np
 import math
-import os
 from sklearn.metrics import accuracy_score
 from os import environ
 environ['OPENBLAS_NUM_THREADS'] = '1'
@@ -22,8 +29,6 @@ environ['OPENBLAS_NUM_THREADS'] = '1'
 import hydra
 from hydra.core.config_store import ConfigStore
 from config_classification import classificationConfig
-from optuna.trial import Trial
-from omegaconf import DictConfig
 from omegaconf import OmegaConf
 
 

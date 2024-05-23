@@ -1,4 +1,4 @@
-name: qiskit_1.0
+name: gspsa
 channels:
   - pytorch
   - nvidia

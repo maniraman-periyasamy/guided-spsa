@@ -1,3 +1,19 @@
+# Author : Maniraman Periyasamy
+# This code is part of guided-spsa repository.
+# This code uses parts of code snippets from qiskit
+# If used in your project please cite this work as described in the README file.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
+
+
+
 from typing import Any, Optional
 
 import numpy as np
@@ -61,11 +77,6 @@ class executer:
         epoch_toggle = True
         for iter, (x, y) in enumerate(tqdm(self.data_loader, desc=desc, ncols=80)):
             
-            #if self.grad_type=="Guided-SPSA" and  epoch_id - best_epoch == 1 and iter<self.ps_exted_counter :
-            #if self.grad_type=="Guided-SPSA" and  self.ps_prioritize:# and iter<self.ps_exted_counter :
-            #    #self.net.QcN.weight_grads = None
-            #    self.net.QcN.grad_reset_counter = 0
-            #    self.net.QcN.grad_decay_epsilon = 1.0
             
 
 

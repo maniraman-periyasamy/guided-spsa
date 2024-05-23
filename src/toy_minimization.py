@@ -1,18 +1,8 @@
 import torch
-import torch.nn.functional as F
-from torch.utils.data import TensorDataset, DataLoader
 
-
-# PyTorch TensorBoard support
-from torch.utils.tensorboard import SummaryWriter
-from datetime import datetime
-
-
-import matplotlib.pyplot as plt
 import numpy as np
 import math
 import os
-from sklearn.metrics import mean_absolute_error
 from os import environ
 environ['OPENBLAS_NUM_THREADS'] = '1'
 
@@ -21,18 +11,12 @@ import hydra
 from hydra.core.config_store import ConfigStore
 from config import regressionConfig
 from optuna.trial import Trial
-from omegaconf import DictConfig
 from omegaconf import OmegaConf
 
 
 
 from models.classical.model import Net
 from models.quantum.model import skolik_arch
-from data.dataset_generator import generate_dataloader
-from train_tools.trainer import executer, execute_epoch
-from train_tools.logger import TensorboardLogger, Stage
-
-from train_tools.save_best_model import SaveBestModel
 from qiskit_aer.noise import NoiseModel
 
 
@@ -89,7 +73,7 @@ def main(cfg: regressionConfig) -> float:
                 if noisy_flag:
                     from qiskit_ibm_provider import IBMProvider
                     # Save your credentials on disk.
-                    IBMProvider.save_account("505b7096b16017f9092f247db96b2d880d4b7cd6eb91bc4112cae85716bb389f91677b0ceb0773eb789a450321645eeb39feadebff90b7c2a9b477ae6ac98f94",
+                    IBMProvider.save_account("ADD API Token",
                         overwrite=True)
                     provider = IBMProvider(instance='ibm-q/open/main')
                     backend = provider.get_backend('ibm_brisbane')
@@ -106,7 +90,7 @@ def main(cfg: regressionConfig) -> float:
                 cfg.algorithm_params.optimizer+"_"+str(cfg.algorithm_params.spsa_batch_size)+"_/"+ dataset_name+ "_"+ str(rep)+"/" +str(cfg.algorithm_params.lr)+"_"+str(cfg.algorithm_params.spsa_epsilon)+"/"
             hydra_cfg = hydra.core.hydra_config.HydraConfig.get()
             log_root = log_root + hydra_cfg['runtime']['output_dir'].split("/guided-spsa/",1)[1]
-            #log_obj = TensorboardLogger(log_path=log_root)
+            
             if not os.path.exists(log_root):
                 os.makedirs(log_root)
             # dumps to file:
@@ -120,8 +104,7 @@ def main(cfg: regressionConfig) -> float:
                 if cfg.algorithm_params.gradient_type == "Guided-SPSA":
                     grad_batch_size_val = max(1,math.floor(grad_batch_size_start + epoch_id*(( len(net.trainable_parameters)*spsa_end_batch_ratio - grad_batch_size_start)/cfg.algorithm_params.epochs)))
                     net.QcN.Grad_executer_spsa._batch_size = grad_batch_size_val
-                    net.QcN.spsa_damping = cfg.algorithm_params.spsa_damping_factor #+ epoch_id*(cfg.algorithm_params.spsa_damping_factor-cfg.algorithm_params.spsa_damping_factor)/100
-                    
+                    net.QcN.spsa_damping = cfg.algorithm_params.spsa_damping_factor
                 optim.zero_grad()
                 input = np.zeros((32, 4))
                 output = net(input)
@@ -144,22 +127,6 @@ def main(cfg: regressionConfig) -> float:
     
     return None
 
-def configure(cfg: regressionConfig, trial: Trial) -> None:
-
-    trial.suggest_loguniform("algorithm_params.lr", 0.001, 0.1)  # note +w here, not w as w is a new parameter
-    trial.suggest_uniform("algorithm_params.spsa_epsilon", 0.1, 0.6)
-
-    if cfg.algorithm_params.optimizer == "SGD" or cfg.algorithm_params.optimizer == "Pure_SPSA":  # "Adam", "SGD", "AMSGrad", "RMSProp"
-        trial.suggest_loguniform("algorithm_params.opt_momentum", 0.001, 0.2)
-        trial.suggest_loguniform("algorithm_params.opt_rho", 0.001, 0.2)
-        
-    elif cfg.algorithm_params.optimizer == "Adam" or cfg.algorithm_params.optimizer == "AMSGrad":
-        trial.suggest_uniform("algorithm_params.opt_momentum", 0.1, 0.9)
-        trial.suggest_uniform("algorithm_params.opt_rho", 0.1, 0.999)
-
-    elif cfg.algorithm_params.optimizer == "RMSProp":
-        trial.suggest_loguniform("algorithm_params.opt_momentum", 0.001, 0.2)
-        trial.suggest_uniform("algorithm_params.opt_rho", 0.1, 0.999)
 
 if __name__ == "__main__":
 
