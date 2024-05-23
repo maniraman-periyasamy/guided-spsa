@@ -1,6 +1,6 @@
 # Guide-SPSA
 
-This repository provides the experimental code for work "[Guided-SPSA: Simultaneous Perturbation Stochastic Approximation assisted by the Parameter Shift Rule by M. Periyasamy et. al.](https://arxiv.org/abs/2404.15751)". However, this repo is an initial experimental implementation of guided-spsa. For the installable model of the guided-spsa gradient evaluation, please refer to the following git repository "[gspsa-gradients](https://github.com/maniraman-periyasamy/gspsa-gradients)".
+This repository provides the experimental code for work "[Guided-SPSA: Simultaneous Perturbation Stochastic Approximation assisted by the Parameter Shift Rule by M. Periyasamy et. al.](https://arxiv.org/abs/2404.15751)". However, this repo is an initial experimental implementation of guided-spsa. For the installable module of the guided-spsa gradient evaluation, please refer to the following git repository "[gspsa-gradients](https://github.com/maniraman-periyasamy/gspsa-gradients)".
 
 
 ## Setup and Installation
